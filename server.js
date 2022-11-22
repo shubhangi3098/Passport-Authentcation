@@ -5,7 +5,7 @@ const session =require('express-session')
 const app=express();
 
 const {connectMongoose, User} =require("./database.js");
-const {initializingPassport} =require('./passportConfig.js')
+const {initializingPassport, isAuthenticated} =require('./passportConfig.js')
 
 
 connectMongoose();
@@ -49,11 +49,21 @@ res.status(201).render("login")
 app.post("/login",
 passport.authenticate("local",{ failureRedirect:"/register"}) ,(req,res)=>{
     
-        res.render("Welcome");
+        res.render("welcome");
         
     
 })
 
+app.get("/profile", isAuthenticated,(req,res)=>{
+    res.send(req.user);
+})  
+
+app.get('/logout', function(req, res, next) {
+    req.logout(function(err) {
+      if (err) { return next(err); }
+      res.send("Logged out....!");
+    });
+  });
 
 
 app.listen(3000,()=>{
